@@ -3,14 +3,11 @@ import pandas as pd
 from flask import Flask, request, jsonify
 import pickle
 import json
-from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app)
-
 
 model = pickle.load(open('testcase_classifier.sav', 'rb'))
-
+scaler = pickle.load(open('scaler.sav', 'rb'))
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -18,11 +15,9 @@ def predict():
     query_df = pd.DataFrame(json_)
     input_data_as_numpy_array = np.asarray(query_df)
     input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
-    prediction = model.predict(input_data_reshaped)
+    input_data_scaled = scaler.transform(input_data_reshaped)
+    prediction = model.predict(input_data_scaled)
     print(prediction)
-    # prediction_list = prediction.tolist()
-    # response = {'Prediction': prediction_list}
-    # response_json = json.dumps(response, default=int)
     if (prediction[0] == 1):
         print('Priority is High')
         pred_val = "High"
@@ -32,9 +27,17 @@ def predict():
     else:
         print('Priority is Low')
         pred_val = "Low"
-    
     return pred_val
 
 
 if __name__ == "__main__":
     app.run(debug=True, port=4000)
+
+
+
+
+
+
+
+
+    
