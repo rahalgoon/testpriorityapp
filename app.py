@@ -3,8 +3,10 @@ import pandas as pd
 from flask import Flask, request, jsonify
 import pickle
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 model = pickle.load(open('testcase_classifier.sav', 'rb'))
 scaler = pickle.load(open('scaler.sav', 'rb'))
